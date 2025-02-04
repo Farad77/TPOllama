@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP Python - Création d'une application avec Ollama</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 1rem;
+        }
+
+        .objective {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 2rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            counter-increment: step;
+        }
+
+        .step::before {
+            content: "Étape " counter(step);
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .model-category {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .model-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .model-option:hover {
+            background: #f1f5f9;
+        }
+
+        .model-option input[type="radio"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin: 0;
+        }
+
+        .model-option label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-card h3 {
+            margin-top: 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>TP Python - Création d'une application avec Ollama</h1>
+
+    <div class="objective">
+        <h2>Objectif</h2>
+        <p>
+            Ce TP vous permettra de créer une application Python qui communique avec un modèle de langage en local via Ollama.
+            Vous aurez le choix entre trois types d'interfaces différentes pour votre application finale.
+        </p>
+    </div>
+
+    <div class="steps">
+        <div class="step">
+            <h3>Installation d'Ollama</h3>
+            <ul>
+                <li>Télécharger Ollama depuis le site officiel</li>
+                <li>Installer Ollama selon votre système d'exploitation</li>
+                <li>Vérifier l'installation en exécutant la commande <code>ollama --version</code></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Installation d'un modèle</h3>
+            <div class="model-categories">
+                <div class="model-category">
+                    <h4>Configuration légère (4-6 Go RAM)</h4>
+                    <div class="model-option">
+                        <input type="radio" name="model" id="llama32-1b" value="llama3.2:1b" checked>
+                        <label for="llama32-1b">Llama 3.2 1B</label>
+                        <code>ollama run llama3.2:1b</code>
+                    </div>
+                </div>
+                <div class="model-category">
+                    <h4>Configuration moyenne (8-12 Go RAM)</h4>
+                    <div class="model-option">
+                        <input type="radio" name="model" id="deepseek7" value="deepseek-r1">
+                        <label for="deepseek7">Deepseek 7B</label>
+                        <code>ollama run deepseek-r1</code>
+                    </div>
+                    <div class="model-option">
+                        <input type="radio" name="model" id="llama31" value="llama3.1">
+                        <label for="llama31">Meta 8B</label>
+                        <code>ollama run llama3.1</code>
+                    </div>
+                    <div class="model-option">
+                        <input type="radio" name="model" id="mistral" value="mistral">
+                        <label for="mistral">Mistral</label>
+                        <code>ollama run mistral</code>
+                    </div>
+                </div>
+                <div class="model-category">
+                    <h4>Configuration élevée (16+ Go RAM)</h4>
+                    <div class="model-option">
+                        <input type="radio" name="model" id="deepseek14" value="deepseek-r1:14b">
+                        <label for="deepseek14">Deepseek 14B</label>
+                        <code>ollama run deepseek-r1:14b</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Création des fonctions de base</h3>
+            <ul>
+                <li>Installer la librairie ollama-python : <code>pip install ollama</code></li>
+                <li>Créer un fichier <code>chat_functions.py</code> avec les fonctions essentielles :
+                    <pre><code># Importation de la fonction chat depuis la librairie ollama
+from ollama import chat
+
+# Fonction pour envoyer un message simple au modèle
+def send_message(model_name: str, message: str) -> str:
+    """
+    Envoie un message simple au modèle et retourne sa réponse
+    Args:
+        model_name: Nom du modèle à utiliser (ex: 'llama3.2:1b')
+        message: Message à envoyer
+    Returns:
+        La réponse du modèle
+    """
+    # Création du message au format attendu par l'API
+    messages = [{'role': 'user', 'content': message}]
+    
+    # Envoi de la requête au modèle
+    response = chat(model=model_name, messages=messages)
+    
+    # Retour du contenu de la réponse
+    return response.message.content
+
+# Test de la fonction
+if __name__ == "__main__":
+    reponse = send_message('llama3.2:1b', 'Dis-moi bonjour!')
+    print(reponse)</code></pre>
+                </li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Ajout du contexte et de l'historique</h3>
+            <ul>
+                <li>Créer les fonctions pour gérer une conversation avec contexte :
+                    <pre><code># Liste pour stocker l'historique des messages
+messages_history = []
+
+def initialize_context(role_description: str) -> None:
+    """
+    Initialise le contexte du chatbot avec un rôle spécifique
+    Args:
+        role_description: Description du rôle que doit jouer le modèle
+    """
+    # On efface l'historique existant
+    messages_history.clear()
+    
+    # On ajoute le message de contexte qui définit le rôle
+    context_message = {
+        'role': 'system',
+        'content': f"Tu es un assistant spécialisé qui agit en tant que {role_description}. " \
+                  f"Réponds toujours en respectant ce rôle."
+    }
+    messages_history.append(context_message)
+
+def send_message_with_history(model_name: str, message: str) -> str:
+    """
+    Envoie un message en tenant compte de l'historique et du contexte
+    Args:
+        model_name: Nom du modèle à utiliser
+        message: Message à envoyer
+    Returns:
+        La réponse du modèle
+    """
+    # Ajout du nouveau message à l'historique
+    messages_history.append({
+        'role': 'user',
+        'content': message
+    })
+    
+    # Envoi de tout l'historique au modèle
+    response = chat(model=model_name, messages=messages_history)
+    
+    # Ajout de la réponse à l'historique
+    messages_history.append(response.message)
+    
+    return response.message.content
+
+# Exemple d'utilisation
+if __name__ == "__main__":
+    # Initialisation du contexte
+    initialize_context("expert en Python qui donne des explications claires et détaillées")
+    
+    # Test de la conversation
+    reponse = send_message_with_history('llama3.2:1b', 
+        'Explique-moi ce qu\'est un décorateur en Python')
+    print(reponse)</code></pre>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Projets au choix</h2>
+    <div class="projects">
+        <div class="project-card">
+            <h3>1. Application Console</h3>
+            <p>Créez une application console interactive avec un contexte spécifique :</p>
+            <ul>
+                <li>Choisissez un rôle spécialisé pour votre chatbot (ex: expert Python, spécialiste cybersécurité, coach agile...)</li>
+                <li>Interaction en mode conversation avec historique</li>
+                <li>Commandes spéciales (ex: /help, /clear pour effacer l'historique, /model pour changer de modèle)</li>
+                <li>Affichage coloré des messages pour distinguer l'utilisateur et l'assistant</li>
+            </ul>
+            <p>Dépendances suggérées : <code>pip install colorama</code> pour les couleurs dans la console</p>
+        </div>
+
+        <div class="project-card">
+            <h3>2. Interface Graphique</h3>
+            <p>Développez une interface graphique personnalisée avec Tkinter :</p>
+            <ul>
+                <li>Interface adaptée au contexte choisi (ex: interface type IDE pour un assistant programmation, interface sécurisée pour un expert cybersécurité)</li>
+                <li>Zone de chat scrollable avec mise en forme adaptée au contexte</li>
+                <li>Champ de saisie avec autocomplétion des commandes</li>
+                <li>Menu de configuration pour changer le modèle et le rôle de l'assistant</li>
+            </ul>
+            <p>Dépendances supplémentaires : <code>pip install tk customtkinter</code></p>
+        </div>
+
+        <div class="project-card">
+            <h3>3. Application Web</h3>
+            <p>Créez une application web moderne avec Flask :</p>
+            <ul>
+                <li>Interface web responsive adaptée au contexte choisi (ex: terminal pour assistant DevOps, interface médicale pour assistant santé)</li>
+                <li>API REST avec endpoints spécialisés selon le contexte</li>
+                <li>Système de sessions pour gérer plusieurs conversations</li>
+                <li>Support du streaming des réponses pour une expérience plus fluide</li>
+                <li>Possibilité de sauvegarder et charger des conversations</li>
+            </ul>
+            <p>Dépendances supplémentaires : <code>pip install flask flask-cors flask-socketio</code></p>
+        </div>
+    </div>
+
+    <div class="warning">
+        <h3>Points d'attention</h3>
+        <ul>
+            <li>Vérifiez toujours que le service Ollama est en cours d'exécution avant de lancer votre application</li>
+            <li>Gérez correctement les erreurs de connexion et les timeouts</li>
+            <li>Documentez votre code et ajoutez des commentaires pertinents</li>
+            <li>Incluez un fichier README.md avec les instructions d'installation et d'utilisation</li>
+        </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fonction pour mettre à jour le modèle dans un bloc de code
+            function updateModelInCode(codeBlock, newModel) {
+                let codeText = codeBlock.innerHTML;
+                
+                // Mise à jour des modèles dans les appels de fonction
+                codeText = codeText.replace(
+                    /model_name='[^']*'/g,
+                    `model_name='${newModel}'`
+                );
+                codeText = codeText.replace(
+                    /model='[^']*'/g,
+                    `model='${newModel}'`
+                );
+                
+                // Mise à jour dans les tests et exemples
+                codeText = codeText.replace(
+                    /send_message\('([^']*)'/g,
+                    `send_message('${newModel}'`
+                );
+                codeText = codeText.replace(
+                    /send_message_with_history\('([^']*)'/g,
+                    `send_message_with_history('${newModel}'`
+                );
+                
+                // Application des modifications
+                codeBlock.innerHTML = codeText;
+            }
+
+            // Gestion du changement de modèle
+            const radioButtons = document.querySelectorAll('input[type="radio"][name="model"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    if (event.target.checked) {
+                        const newModel = event.target.value;
+                        console.log('Changing model to:', newModel);
+                        
+                        // Mise à jour de tous les blocs de code
+                        document.querySelectorAll('pre code').forEach(codeBlock => {
+                            updateModelInCode(codeBlock, newModel);
+                        });
+                    }
+                });
+            });
+            
+            // Initialisation avec le modèle sélectionné par défaut
+            const defaultModel = document.querySelector('input[type="radio"][name="model"]:checked').value;
+            document.querySelectorAll('pre code').forEach(codeBlock => {
+                updateModelInCode(codeBlock, defaultModel);
+            });
+        });
+    </script>
+</body>
+</html>
